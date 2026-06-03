@@ -6,11 +6,21 @@ const authorsRouter = express.Router()
 // GET tutti gli autori
 authorsRouter.get("/", async (req, res) => {
     try {
+        const page = req.query.page || 1
+        const limit = req.query.limit || 10
+
         const authors = await Author.find()
+            .limit(limit)
+            .skip((page - 1) * limit)
+
+        const totalAuthors = await Author.countDocuments()
 
         res.status(200).json({
             statusCode: 200,
             message: "OK",
+            count: totalAuthors,
+            totalPages: Math.ceil(totalAuthors / limit),
+            currentPage: Number(page),
             data: authors
         })
 
