@@ -54,22 +54,30 @@ Il progetto permette di gestire autori e articoli di un blog attraverso API REST
 * Visualizzazione di un singolo blog post
 * Modifica di un blog post
 * Eliminazione di un blog post
-* Paginazione dei risultati
 * Collegamento di ogni post al relativo autore
 * Popolamento dei dati dell'autore tramite Mongoose
 * Upload della cover su Cloudinary
 
+### 💬 Gestione Commenti
+
+* Creazione di un commento associato a un blog post
+* Visualizzazione di tutti i commenti di un blog post
+* Visualizzazione di un singolo commento
+* Modifica di un commento
+* Eliminazione di un commento
+
 ### 🌐 Frontend React
 
-* Visualizzazione dei post salvati nel database
-* Visualizzazione della pagina di dettaglio di un post
-* Collegamento tra React e API Express
+* Home con lista dei post recuperati dalle API Express
+* Pagina di dettaglio di un post
 * Navigazione tra home, dettaglio del post e pagina di creazione
 * Editor di testo WYSIWYG per la scrittura dei contenuti
 * Componente per la gestione dei like lato interfaccia
 * Interfaccia basata sul template fornito da Strive School
 
-> I like sono attualmente gestiti nello stato locale del frontend e non vengono ancora salvati nel database.
+> La pagina di creazione contiene attualmente solo l'interfaccia del form: l'invio del nuovo articolo alle API non è ancora implementato.
+>
+> I like sono gestiti nello stato locale del frontend e non vengono salvati nel database.
 
 ---
 
@@ -77,6 +85,9 @@ Il progetto permette di gestire autori e articoli di un blog attraverso API REST
 
 ```text
 Strive-Blog
+│
+├── README.md
+├── package.json
 │
 ├── Backend
 │   ├── middlewares
@@ -88,6 +99,7 @@ Strive-Blog
 │   │   ├── authors.js
 │   │   └── blogPosts.js
 │   ├── server.js
+│   ├── package.json
 │   └── .env
 │
 └── Frontend
@@ -120,13 +132,19 @@ npm install
 npm run dev
 ```
 
+Il backend sarà disponibile su `http://localhost:3001`.
+
 ### 3. Installare il Frontend
+
+Da un secondo terminale, partendo dalla cartella principale del progetto:
 
 ```bash
 cd Frontend
 npm install
 npm start
 ```
+
+Il frontend sarà disponibile su `http://localhost:3000`.
 
 ---
 
@@ -169,16 +187,86 @@ Il backend viene eseguito su `http://localhost:3001`.
 | DELETE | /blogPosts/:id                 | Elimina un blog post           |
 | PATCH  | /blogPosts/:blogPostId/cover   | Carica la cover su Cloudinary  |
 
-Le richieste `GET /authors` e `GET /blogPosts` supportano la paginazione tramite i parametri:
+### Commenti
 
-```text
-?page=1&limit=10
+| Metodo | Endpoint                                | Descrizione                              |
+| ------ | --------------------------------------- | ---------------------------------------- |
+| GET    | /blogPosts/:id/comments                 | Recupera tutti i commenti del post       |
+| GET    | /blogPosts/:id/comments/:commentId      | Recupera un singolo commento             |
+| POST   | /blogPosts/:id/comments                 | Aggiunge un commento al post             |
+| PUT    | /blogPosts/:id/comments/:commentId      | Modifica un commento                     |
+| DELETE | /blogPosts/:id/comments/:commentId      | Elimina un commento                      |
+
+La richiesta `GET /authors` supporta la paginazione tramite i parametri `page` e `limit`:
+
+```http
+GET /authors?page=1&limit=10
 ```
+
+La paginazione dei blog post non è ancora implementata.
 
 Per gli endpoint di upload è necessario inviare una richiesta `multipart/form-data`:
 
 * campo `avatar` per l'avatar dell'autore
 * campo `cover` per la cover del blog post
+
+---
+
+## 🧩 Modelli dati
+
+### Autore
+
+```json
+{
+  "nome": "Mario",
+  "cognome": "Rossi",
+  "email": "mario.rossi@example.com",
+  "dataDiNascita": "1990-01-01",
+  "avatar": "https://..."
+}
+```
+
+### Blog post
+
+```json
+{
+  "category": "Tecnologia",
+  "title": "Titolo del post",
+  "cover": "https://...",
+  "readTime": {
+    "value": 5,
+    "unit": "min"
+  },
+  "author": "ID_AUTORE",
+  "content": "<p>Contenuto del post</p>"
+}
+```
+
+### Commento
+
+```json
+{
+  "name": "Mario Rossi",
+  "comment": "Testo del commento"
+}
+```
+
+---
+
+## 🚧 Stato attuale e limitazioni
+
+Il modello Mongoose dei blog post usa i campi `title`, `content` e `author`.
+Le query di popolamento e il mapping del frontend usano invece `autore`,
+`titolo` e `contenuto`. Prima di utilizzare correttamente lista e dettaglio dei
+post, questi nomi devono essere uniformati nel backend e nel frontend.
+
+Inoltre:
+
+* il form `/new` non esegue ancora una richiesta `POST`;
+* non esiste una rotta frontend dedicata alla pagina `404`;
+* gli URL delle API sono scritti direttamente nel codice frontend;
+* non sono presenti test automatici per le API backend;
+* il frontend contiene un solo test di rendering della home.
 
 ---
 
@@ -188,9 +276,10 @@ Per gli endpoint di upload è necessario inviare una richiesta `multipart/form-d
 * Utilizzare MongoDB Atlas e Mongoose
 * Creare API REST complete
 * Gestire operazioni CRUD
-* Implementare la paginazione
+* Implementare la paginazione degli autori
 * Collegare un frontend React ad un backend Node.js
 * Gestire file e immagini attraverso Cloudinary
 * Collegare i blog post agli autori tramite riferimenti MongoDB
+* Gestire commenti incorporati nei blog post
 
 ---
