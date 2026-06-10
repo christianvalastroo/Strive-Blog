@@ -70,13 +70,14 @@ Il progetto permette di gestire autori e articoli di un blog attraverso API REST
 
 * Home con lista dei post recuperati dalle API Express
 * Pagina di dettaglio di un post
+* Visualizzazione di titolo, contenuto e autore popolato nelle card e nel dettaglio
 * Navigazione tra home, dettaglio del post e pagina di creazione
+* Creazione di nuovi blog post tramite richiesta `POST`
+* Selezione dell'autore recuperato dalle API
 * Editor di testo WYSIWYG per la scrittura dei contenuti
 * Componente per la gestione dei like lato interfaccia
 * Interfaccia basata sul template fornito da Strive School
 
-> La pagina di creazione contiene attualmente solo l'interfaccia del form: l'invio del nuovo articolo alle API non è ancora implementato.
->
 > I like sono gestiti nello stato locale del frontend e non vengono salvati nel database.
 
 ---
@@ -222,7 +223,7 @@ Per gli endpoint di upload è necessario inviare una richiesta `multipart/form-d
   "cognome": "Rossi",
   "email": "mario.rossi@example.com",
   "dataDiNascita": "1990-01-01",
-  "avatar": "https://..."
+  "avatar": "https://res.cloudinary.com/example/image/upload/avatar.jpg"
 }
 ```
 
@@ -232,10 +233,10 @@ Per gli endpoint di upload è necessario inviare una richiesta `multipart/form-d
 {
   "category": "Tecnologia",
   "title": "Titolo del post",
-  "cover": "https://...",
+  "cover": "https://res.cloudinary.com/example/image/upload/cover.jpg",
   "readTime": {
     "value": 5,
-    "unit": "min"
+    "unit": "minutes"
   },
   "author": "ID_AUTORE",
   "content": "<p>Contenuto del post</p>"
@@ -255,16 +256,20 @@ Per gli endpoint di upload è necessario inviare una richiesta `multipart/form-d
 
 ## 🚧 Stato attuale e limitazioni
 
-Il modello Mongoose dei blog post usa i campi `title`, `content` e `author`.
-Le query di popolamento e il mapping del frontend usano invece `autore`,
-`titolo` e `contenuto`. Prima di utilizzare correttamente lista e dettaglio dei
-post, questi nomi devono essere uniformati nel backend e nel frontend.
+Il modello e il frontend utilizzano gli stessi campi inglesi per i blog post:
+`title`, `category`, `cover`, `readTime`, `author` e `content`.
+
+Le rotte di lista, dettaglio e modifica popolano il riferimento all'autore con
+`.populate("author")`. Il frontend mostra nome, cognome e avatar usando i campi
+italiani del modello autore: `nome`, `cognome` e `avatar`.
 
 Inoltre:
 
-* il form `/new` non esegue ancora una richiesta `POST`;
 * non esiste una rotta frontend dedicata alla pagina `404`;
 * gli URL delle API sono scritti direttamente nel codice frontend;
+* i like non vengono salvati nel database;
+* gli avatar richiedono un URL immagine valido, ad esempio quello restituito da Cloudinary;
+* i post che fanno riferimento a un autore eliminato ricevono `author: null`;
 * non sono presenti test automatici per le API backend;
 * il frontend contiene un solo test di rendering della home.
 

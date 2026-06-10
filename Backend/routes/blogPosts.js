@@ -7,7 +7,7 @@ const blogPostsRouter = express.Router()
 // GET tutti i blog post
 blogPostsRouter.get("/", async (req, res) => {
     try {
-        const blogPosts = await BlogPost.find().populate("autore")
+        const blogPosts = await BlogPost.find().populate("author")
 
         res.status(200).json({
             statusCode: 200,
@@ -217,7 +217,7 @@ blogPostsRouter.delete("/:id/comments/:commentId", async (req, res) => {
 // GET blog post singolo
 blogPostsRouter.get("/:id", async (req, res) => {
     try {
-        const blogPost = await BlogPost.findById(req.params.id).populate("autore")
+        const blogPost = await BlogPost.findById(req.params.id).populate("author")
 
         if (!blogPost) {
             return res.status(404).json({
@@ -246,7 +246,7 @@ blogPostsRouter.put("/:id", async (req, res) => {
             req.params.id,
             req.body,
             { new: true }
-        ).populate("autore")
+        ).populate("author")
 
         if (!updatedBlogPost) {
             return res.status(404).json({

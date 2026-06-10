@@ -4,24 +4,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import BlogAuthor from "../../components/blog/blog-author/BlogAuthor";
 import BlogLike from "../../components/navbar/likes/BlogLike";
 import "./styles.css";
-const Blog = props => {
-  const [blog, setBlog] = useState({});
+
+const Blog = () => {
+  const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Mantiene il formato atteso dal template anche usando i dati MongoDB.
-    const mapBlogPost = post => ({
-      ...post,
-      title: post.titolo,
-      content: post.contenuto,
-      author: {
-        name: post.autore ? `${post.autore.nome} ${post.autore.cognome}` : "",
-        avatar: post.autore?.avatar,
-      },
-    });
-
     const getBlogPost = async () => {
       try {
         const response = await fetch(`http://localhost:3001/blogPosts/${params.id}`);
@@ -33,18 +23,19 @@ const Blog = props => {
 
         const result = await response.json();
 
-        setBlog(mapBlogPost(result.data));
-        setLoading(false);
+        setBlog(result.data);
       } catch (error) {
         console.log(error);
         navigate("/404");
+      } finally {
+        setLoading(false);
       }
     };
 
     getBlogPost();
   }, [navigate, params.id]);
 
-  if (loading) {
+  if (loading || !blog) {
     return <div>loading</div>;
   } else {
     return (
@@ -55,11 +46,13 @@ const Blog = props => {
 
           <div className="blog-details-container">
             <div className="blog-details-author">
-              <BlogAuthor {...blog.author} />
+              <BlogAuthor author={blog.author} />
             </div>
             <div className="blog-details-info">
               <div>{blog.createdAt}</div>
-              <div>{`lettura da ${blog.readTime.value} ${blog.readTime.unit}`}</div>
+              {blog.readTime && (
+                <div>{`lettura da ${blog.readTime.value} ${blog.readTime.unit}`}</div>
+              )}
               <div
                 style={{
                   marginTop: 20,

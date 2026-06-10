@@ -1,47 +1,181 @@
-import React, { useState } from "react";
-import { Button, Container, Form } from "react-bootstrap";
-import { Editor } from 'react-draft-wysiwyg';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import React, { useEffect, useState } from "react";
+import { Button, Container, Form, Row, Col } from "react-bootstrap";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import "./styles.css";
-import draftToHtml from "draftjs-to-html"
-const NewBlogPost = props => {
-  const [text, setText] = useState("");
-  const handleChange = value => {
-    setText(draftToHtml(value));
+import draftToHtml from "draftjs-to-html";
+
+const NewBlogPost = () => {
+  const [authors, setAuthors] = useState([]);
+
+  const [blogPost, setBlogPost] = useState({
+    title: "",
+    category: "",
+    cover: "",
+    readTime: {
+      value: 1,
+      unit: "minutes",
+    },
+    author: "",
+    content: "",
+  });
+
+  const getAuthors = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/authors");
+      const data = await response.json();
+
+      setAuthors(data.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  useEffect(() => {
+    getAuthors();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "readTimeValue") {
+      setBlogPost({
+        ...blogPost,
+        readTime: {
+          ...blogPost.readTime,
+          value: Number(value),
+        },
+      });
+    } else {
+      setBlogPost({
+        ...blogPost,
+        [name]: value,
+      });
+    }
+  };
+
+  const handleEditorChange = (value) => {
+    setBlogPost({
+      ...blogPost,
+      content: draftToHtml(value),
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:3001/blogPosts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(blogPost),
+      });
+
+      const data = await response.json();
+
+      console.log(data);
+      alert("Blog post creato!");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Container className="new-blog-container">
-      <Form className="mt-5">
-        <Form.Group controlId="blog-form" className="mt-3">
-          <Form.Label>Titolo</Form.Label>
-          <Form.Control size="lg" placeholder="Title" />
-        </Form.Group>
-        <Form.Group controlId="blog-category" className="mt-3">
-          <Form.Label>Categoria</Form.Label>
-          <Form.Control size="lg" as="select">
-            <option>Categoria 1</option>
-            <option>Categoria 2</option>
-            <option>Categoria 3</option>
-            <option>Categoria 4</option>
-            <option>Categoria 5</option>
+      <Form className="mt-5" onSubmit={handleSubmit}>
+        <Form.Group controlId="blog-author" className="mt-3">
+          <Form.Label>Autore</Form.Label>
+          <Form.Control
+            size="lg"
+            as="select"
+            name="author"
+            value={blogPost.author}
+            onChange={handleChange}
+          >
+            <option value="">Seleziona autore</option>
+            {authors.map((author) => (
+              <option key={author._id} value={author._id}>
+                {author.nome} {author.cognome} - {author.email}
+              </option>
+            ))}
           </Form.Control>
         </Form.Group>
+
+        <Form.Group controlId="blog-title" className="mt-3">
+          <Form.Label>Titolo</Form.Label>
+          <Form.Control
+            size="lg"
+            placeholder="Title"
+            name="title"
+            value={blogPost.title}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="blog-cover" className="mt-3">
+          <Form.Label>Cover URL</Form.Label>
+          <Form.Control
+            size="lg"
+            placeholder="https://..."
+            name="cover"
+            value={blogPost.cover}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Row>
+          <Col>
+            <Form.Group controlId="blog-readtime" className="mt-3">
+              <Form.Label>Read time</Form.Label>
+              <Form.Control
+                size="lg"
+                type="number"
+                min="1"
+                name="readTimeValue"
+                value={blogPost.readTime.value}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+
+          <Col>
+            <Form.Group controlId="blog-category" className="mt-3">
+              <Form.Label>Categoria</Form.Label>
+              <Form.Control
+                size="lg"
+                as="select"
+                name="category"
+                value={blogPost.category}
+                onChange={handleChange}
+              >
+                <option value="">Seleziona categoria</option>
+                <option value="Technology">Technology</option>
+                <option value="Frontend">Frontend</option>
+                <option value="Backend">Backend</option>
+                <option value="React">React</option>
+                <option value="MongoDB">MongoDB</option>
+              </Form.Control>
+            </Form.Group>
+          </Col>
+        </Row>
+
         <Form.Group controlId="blog-content" className="mt-3">
           <Form.Label>Contenuto Blog</Form.Label>
-
-          <Editor value={text} onChange={handleChange} className="new-blog-content" />
+          <Editor onChange={handleEditorChange} className="new-blog-content" />
         </Form.Group>
+
         <Form.Group className="d-flex mt-3 justify-content-end">
           <Button type="reset" size="lg" variant="outline-dark">
             Reset
           </Button>
+
           <Button
             type="submit"
             size="lg"
             variant="dark"
-            style={{
-              marginLeft: "1em",
-            }}
+            style={{ marginLeft: "1em" }}
           >
             Invia
           </Button>

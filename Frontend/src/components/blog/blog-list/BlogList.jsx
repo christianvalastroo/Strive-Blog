@@ -2,27 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import BlogItem from "../blog-item/BlogItem";
 
-const BlogList = props => {
+const BlogList = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    // Adatta i nomi dei campi del backend al template fornito.
-    const mapBlogPost = post => ({
-      ...post,
-      title: post.titolo,
-      content: post.contenuto,
-      author: {
-        name: post.autore ? `${post.autore.nome} ${post.autore.cognome}` : "",
-        avatar: post.autore?.avatar,
-      },
-    });
-
     const getBlogPosts = async () => {
       try {
         const response = await fetch("http://localhost:3001/blogPosts");
+
+        if (response.ok === false) {
+          throw new Error("Errore nel recupero dei blog post");
+        }
+
         const result = await response.json();
 
-        setPosts(result.data.map(mapBlogPost));
+        setPosts(result.data);
       } catch (error) {
         console.log(error);
       }
