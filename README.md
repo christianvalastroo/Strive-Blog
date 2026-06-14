@@ -88,18 +88,40 @@ Il progetto permette di gestire autori e articoli di un blog attraverso API REST
 Strive-Blog
 │
 ├── README.md
-├── package.json
 │
 ├── Backend
+│   ├── config
+│   │   └── db.js
+│   ├── exceptions
+│   │   └── AppError.js
 │   ├── middlewares
-│   │   └── cloudinaryUploader.js
-│   ├── models
-│   │   ├── Author.js
-│   │   └── BlogPost.js
-│   ├── routes
-│   │   ├── authors.js
-│   │   └── blogPosts.js
-│   ├── server.js
+│   │   ├── errors
+│   │   │   └── errorHandler.js
+│   │   └── multer
+│   │       └── index.js
+│   ├── modules
+│   │   ├── auth
+│   │   │   ├── password
+│   │   │   │   └── password.service.js
+│   │   │   ├── auth.controller.js
+│   │   │   ├── auth.route.js
+│   │   │   └── auth.service.js
+│   │   ├── authors
+│   │   │   ├── authors.controller.js
+│   │   │   ├── authors.route.js
+│   │   │   ├── authors.schema.js
+│   │   │   └── authors.service.js
+│   │   ├── comments
+│   │   │   ├── comments.controller.js
+│   │   │   ├── comments.route.js
+│   │   │   ├── comments.schema.js
+│   │   │   └── comments.service.js
+│   │   └── posts
+│   │       ├── posts.controller.js
+│   │       ├── posts.route.js
+│   │       ├── posts.schema.js
+│   │       └── posts.service.js
+│   ├── main.js
 │   ├── package.json
 │   └── .env
 │

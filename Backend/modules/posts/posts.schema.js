@@ -1,20 +1,6 @@
 const mongoose = require("mongoose")
-
-const commentSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: true
-        },
-        comment: {
-            type: String,
-            required: true
-        }
-    },
-    {
-        timestamps: true
-    }
-)
+const commentSchema = require("../comments/comments.schema")
+require("../authors/authors.schema")
 
 const blogPostSchema = new mongoose.Schema(
     {
@@ -26,9 +12,7 @@ const blogPostSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        cover: {
-            type: String
-        },
+        cover: String,
         readTime: {
             value: Number,
             unit: String

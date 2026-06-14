@@ -4,26 +4,22 @@ const authorSchema = new mongoose.Schema(
     {
         nome: {
             type: String,
-            required: true,
+            required: true
         },
         cognome: {
             type: String,
-            required: true,
+            required: true
         },
         email: {
             type: String,
             required: true,
-            unique: true,
+            unique: true
         },
-        dataDiNascita: {
-            type: String,
-        },
-        avatar: {
-            type: String,
-        },
+        dataDiNascita: String,
+        avatar: String
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 )
 
